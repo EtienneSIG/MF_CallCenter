@@ -1,0 +1,128 @@
+# Configuration pour la génération de données synthétiques
+# Démo Microsoft Fabric - Customer 360 + Call Center
+
+# Seed pour la reproductibilité
+seed: 42
+
+# Volumes de données
+volumes:
+  customers: 500
+  products: 80
+  orders: 20000
+  order_lines: 60000  # Sera calculé automatiquement (3 lignes/commande en moyenne)
+  calls: 3000
+  agents: 25
+
+# Période de génération (ISO 8601)
+date_range:
+  start: "2025-08-01"  # 6 mois avant aujourd'hui
+  end: "2026-01-28"
+
+# Paramètres métier
+business_params:
+  # Répartition des types de clients (en %)
+  customer_segments:
+    premium: 15
+    regular: 60
+    occasional: 25
+  
+  # Comportement d'achat
+  orders:
+    avg_lines_per_order: 3
+    max_lines_per_order: 10
+    premium_order_multiplier: 2.5  # Clients premium commandent plus
+    
+  # Call center
+  calls:
+    # Probabilité qu'un client ayant commandé appelle
+    call_probability_after_order: 0.15
+    # Fenêtre temporelle pour lier un appel à une commande (jours)
+    call_window_days: 14
+    
+    # Répartition des raisons d'appel (en %)
+    reasons:
+      retard_livraison: 30
+      remboursement: 15
+      panne_produit: 20
+      changement_info: 10
+      question_produit: 15
+      autre: 10
+    
+    # Répartition des canaux
+    channels:
+      phone: 70
+      email: 20
+      chat: 10
+    
+    # Satisfaction (1-5)
+    satisfaction:
+      avg: 3.8
+      std_dev: 1.0
+    
+    # Taux de résolution
+    resolution_rate: 0.75
+  
+  # Transcripts
+  transcripts:
+    language: "fr"
+    avg_exchanges: 6  # Nombre moyen d'échanges client/agent
+    std_dev_exchanges: 2
+    include_fake_pii: true  # Inclure de fausses PII pour démo
+    pii_probability: 0.3  # Probabilité qu'un transcript contienne PII
+    
+    # Sentiment (sera lié à la satisfaction)
+    sentiment_mapping:
+      positive: [4, 5]  # Satisfaction 4-5 = positif
+      neutral: [3]      # Satisfaction 3 = neutre
+      negative: [1, 2]  # Satisfaction 1-2 = négatif
+
+# Produits - catégories et prix
+products:
+  categories:
+    - name: "Électronique"
+      count: 25
+      price_range: [50, 1500]
+      failure_rate: 0.15  # Probabilité d'appel pour panne
+    - name: "Électroménager"
+      count: 20
+      price_range: [100, 2000]
+      failure_rate: 0.20
+    - name: "Meubles"
+      count: 15
+      price_range: [200, 3000]
+      failure_rate: 0.05
+    - name: "Mode"
+      count: 15
+      price_range: [20, 300]
+      failure_rate: 0.10
+    - name: "Jardin"
+      count: 5
+      price_range: [30, 800]
+      failure_rate: 0.08
+
+# Agents du call center
+agents:
+  experience_distribution:
+    junior: 0.4
+    senior: 0.4
+    expert: 0.2
+  
+  languages:
+    - "fr"
+    - "en"
+  
+  avg_calls_per_day: 15
+
+# Format de sortie
+output:
+  encoding: "utf-8"
+  csv_separator: ","
+  date_format: "%Y-%m-%d %H:%M:%S"
+  decimal_separator: "."
+  
+# Chemins de sortie (relatifs au root du projet)
+paths:
+  output_base: "data/raw"
+  commerce: "data/raw/commerce"
+  callcenter: "data/raw/callcenter"
+  transcripts: "data/raw/callcenter/transcripts_txt"

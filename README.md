@@ -154,6 +154,7 @@ Voir [`docs/questions_demo.md`](docs/questions_demo.md) pour 15 questions "wow e
 |----------|-------------|
 | [`docs/schema.md`](docs/schema.md) | Schéma complet des tables (colonnes, types, relations, index) |
 | [`docs/demo_story.md`](docs/demo_story.md) | Scénario narratif de la démo (Sophie la cliente mécontente) |
+| [`docs/dax_measures.md`](docs/dax_measures.md) | 40+ mesures DAX validées et testées |
 | [`docs/questions_demo.md`](docs/questions_demo.md) | 15 questions à poser au Data Agent (ordre recommandé) |
 | [`docs/fabric_setup.md`](docs/fabric_setup.md) | Guide step-by-step pour déployer dans Fabric |
 | [`docs/data_agent_instructions.md`](docs/data_agent_instructions.md) | Instructions (system prompt) pour le Data Agent |
@@ -387,3 +388,4 @@ Après avoir suivi ce guide, vous aurez :
 **Durée de préparation** : 1-2 heures (génération + déploiement)  
 **Durée de présentation** : 15-30 minutes  
 **Wow factor** : 🔥🔥🔥
+

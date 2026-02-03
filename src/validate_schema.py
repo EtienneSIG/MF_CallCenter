@@ -45,9 +45,9 @@ class SchemaValidator:
         print("--- Validation Commerce Tables ---")
         
         # customers
-        customers = self.load_csv('commerce/customers.csv')
+        customers = self.load_csv('commerce/dim_customers.csv')
         if customers is not None:
-            self.check_columns(customers, 'customers', [
+            self.check_columns(customers, 'dim_customers', [
                 'customer_id', 'email', 'registration_date', 'segment',
                 'country', 'preferred_language'
             ])
@@ -58,23 +58,23 @@ class SchemaValidator:
                 self.errors.append("customers.customer_id doit être au format 'CUST_XXXXXX'")
         
         # products
-        products = self.load_csv('commerce/products.csv')
+        products = self.load_csv('commerce/dim_products.csv')
         if products is not None:
-            self.check_columns(products, 'products', [
+            self.check_columns(products, 'dim_products', [
                 'product_id', 'product_name', 'category', 'price_eur'
             ])
         
         # orders
-        orders = self.load_csv('commerce/orders.csv')
+        orders = self.load_csv('commerce/fact_orders.csv')
         if orders is not None:
-            self.check_columns(orders, 'orders', [
+            self.check_columns(orders, 'fact_orders', [
                 'order_id', 'customer_id', 'order_at', 'total_amount_eur', 'status'
             ])
         
         # order_lines
-        lines = self.load_csv('commerce/order_lines.csv')
+        lines = self.load_csv('commerce/fact_order_lines.csv')
         if lines is not None:
-            self.check_columns(lines, 'order_lines', [
+            self.check_columns(lines, 'fact_order_lines', [
                 'order_line_id', 'order_id', 'product_id', 'qty',
                 'unit_price_eur', 'line_total_eur'
             ])
@@ -86,9 +86,9 @@ class SchemaValidator:
         print("--- Validation Call Center Tables ---")
         
         # calls (CRITIQUE pour DAX)
-        calls = self.load_csv('callcenter/calls.csv')
+        calls = self.load_csv('callcenter/fact_calls.csv')
         if calls is not None:
-            self.check_columns(calls, 'calls', [
+            self.check_columns(calls, 'fact_calls', [
                 'call_id', 'customer_id', 'agent_id', 'call_start',
                 'call_duration', 'reason', 'satisfaction_score', 'resolved'
             ])
@@ -117,9 +117,9 @@ class SchemaValidator:
                 print(f"  ℹ️  Raisons d'appel: {len(reasons)} types trouvés")
         
         # agents
-        agents = self.load_csv('callcenter/agents.csv')
+        agents = self.load_csv('callcenter/dim_agents.csv')
         if agents is not None:
-            self.check_columns(agents, 'agents', [
+            self.check_columns(agents, 'dim_agents', [
                 'agent_id', 'agent_name', 'hire_date', 'specialization'
             ])
         
@@ -130,10 +130,10 @@ class SchemaValidator:
         print("--- Validation Relations (Foreign Keys) ---")
         
         # Charger les tables principales
-        customers = self.load_csv('commerce/customers.csv')
-        calls = self.load_csv('callcenter/calls.csv')
-        agents = self.load_csv('callcenter/agents.csv')
-        orders = self.load_csv('commerce/orders.csv')
+        customers = self.load_csv('commerce/dim_customers.csv')
+        calls = self.load_csv('callcenter/fact_calls.csv')
+        agents = self.load_csv('callcenter/dim_agents.csv')
+        orders = self.load_csv('commerce/fact_orders.csv')
         
         if customers is None or calls is None or agents is None:
             self.errors.append("Impossible de valider les relations: tables manquantes")

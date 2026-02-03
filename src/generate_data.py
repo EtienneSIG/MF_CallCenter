@@ -576,31 +576,31 @@ class DataGenerator:
         print("🚀 GÉNÉRATION DES DONNÉES SYNTHÉTIQUES")
         print("="*60)
         
-        # 1. Customers
+        # 1. Customers (dimension)
         customers_df = self.generate_customers()
-        self.save_csv(customers_df, 'customers.csv', self.commerce_path)
+        self.save_csv(customers_df, 'dim_customers.csv', self.commerce_path)
         
-        # 2. Products
+        # 2. Products (dimension)
         products_df = self.generate_products()
-        self.save_csv(products_df, 'products.csv', self.commerce_path)
+        self.save_csv(products_df, 'dim_products.csv', self.commerce_path)
         
-        # 3. Orders
+        # 3. Orders (fact)
         orders_df = self.generate_orders(customers_df)
-        self.save_csv(orders_df, 'orders.csv', self.commerce_path)
+        self.save_csv(orders_df, 'fact_orders.csv', self.commerce_path)
         
-        # 4. Order Lines
+        # 4. Order Lines (fact)
         order_lines_df = self.generate_order_lines(orders_df, products_df)
-        self.save_csv(order_lines_df, 'order_lines.csv', self.commerce_path)
+        self.save_csv(order_lines_df, 'fact_order_lines.csv', self.commerce_path)
         
-        # 5. Agents
+        # 5. Agents (dimension)
         agents_df = self.generate_agents()
-        self.save_csv(agents_df, 'agents.csv', self.callcenter_path)
+        self.save_csv(agents_df, 'dim_agents.csv', self.callcenter_path)
         
-        # 6. Calls + transcript metadata
+        # 6. Calls + transcript metadata (fact)
         calls_df, transcript_metadata = self.generate_calls(
             customers_df, orders_df, agents_df, products_df
         )
-        self.save_csv(calls_df, 'calls.csv', self.callcenter_path)
+        self.save_csv(calls_df, 'fact_calls.csv', self.callcenter_path)
         
         # 7. Transcripts
         self.generate_transcripts(transcript_metadata)

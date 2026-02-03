@@ -15,11 +15,11 @@ Ce fichier contient toutes les mesures DAX testées et validées pour le semanti
 ## Relations Clés
 
 ```
-customers[customer_id] 1 ----→ * calls[customer_id]
-customers[customer_id] 1 ----→ * orders[customer_id]
-agents[agent_id] 1 ----→ * calls[agent_id]
-orders[order_id] 1 ----→ * order_lines[order_id]
-products[product_id] 1 ----→ * order_lines[product_id]
+dim_customers[customer_id] 1 ----→ * fact_calls[customer_id]
+dim_customers[customer_id] 1 ----→ * fact_orders[customer_id]
+dim_agents[agent_id] 1 ----→ * fact_calls[agent_id]
+fact_orders[order_id] 1 ----→ * fact_order_lines[order_id]
+dim_products[product_id] 1 ----→ * fact_order_lines[product_id]
 ```
 
 ---
@@ -33,7 +33,7 @@ Score de satisfaction moyen.
 ```dax
 CSAT = 
 DIVIDE(
-    AVERAGE(calls[satisfaction_score]),
+    AVERAGE(fact_calls[satisfaction_score]),
     5,
     BLANK()
 ) * 100
@@ -51,7 +51,7 @@ Score brut de satisfaction.
 
 ```dax
 CSAT Score = 
-AVERAGE(calls[satisfaction_score])
+AVERAGE(fact_calls[satisfaction_score])
 ```
 
 **Format:** Nombre (0-5)
@@ -82,7 +82,7 @@ FCR =
 VAR ResolvedCalls = 
     CALCULATE(
         COUNTROWS(calls),
-        calls[resolved] = TRUE()
+        fact_calls[resolved] = TRUE()
     )
 VAR TotalCalls = COUNTROWS(calls)
 RETURN
@@ -103,7 +103,7 @@ Nombre d'appels résolus.
 Resolved Calls = 
 CALCULATE(
     COUNTROWS(calls),
-    calls[resolved] = TRUE()
+    fact_calls[resolved] = TRUE()
 )
 ```
 
@@ -120,7 +120,7 @@ Appels non résolus.
 Unresolved Calls = 
 CALCULATE(
     COUNTROWS(calls),
-    calls[resolved] = FALSE()
+    fact_calls[resolved] = FALSE()
 )
 ```
 
@@ -135,7 +135,7 @@ Durée moyenne de traitement.
 
 ```dax
 AHT = 
-AVERAGE(calls[call_duration])
+AVERAGE(fact_calls[call_duration])
 ```
 
 **Format:** Nombre (minutes)
@@ -150,7 +150,7 @@ Durée totale des appels.
 
 ```dax
 Total Call Duration = 
-SUM(calls[call_duration])
+SUM(fact_calls[call_duration])
 ```
 
 **Format:** Nombre (minutes)
@@ -166,13 +166,13 @@ Taux d'appels répétés (clients avec 2+ appels même raison).
 Repeat Call Rate = 
 VAR CustomersWithMultipleCalls = 
     CALCULATE(
-        DISTINCTCOUNT(calls[customer_id]),
+        DISTINCTCOUNT(fact_calls[customer_id]),
         FILTER(
-            VALUES(calls[customer_id]),
+            VALUES(fact_calls[customer_id]),
             CALCULATE(COUNTROWS(calls)) >= 2
         )
     )
-VAR TotalCustomers = DISTINCTCOUNT(calls[customer_id])
+VAR TotalCustomers = DISTINCTCOUNT(fact_calls[customer_id])
 RETURN
     DIVIDE(CustomersWithMultipleCalls, TotalCustomers, 0)
 ```
@@ -191,7 +191,7 @@ Nombre moyen d'appels par client.
 Avg Calls Per Customer = 
 DIVIDE(
     COUNTROWS(calls),
-    DISTINCTCOUNT(calls[customer_id]),
+    DISTINCTCOUNT(fact_calls[customer_id]),
     BLANK()
 )
 ```
@@ -208,8 +208,8 @@ Clients insatisfaits (satisfaction <= 2).
 ```dax
 Customers at Risk = 
 CALCULATE(
-    DISTINCTCOUNT(calls[customer_id]),
-    calls[satisfaction_score] <= 2
+    DISTINCTCOUNT(fact_calls[customer_id]),
+    fact_calls[satisfaction_score] <= 2
 )
 ```
 
@@ -226,10 +226,10 @@ Revenue potentiel perdu (clients insatisfaits).
 Churn Risk Revenue = 
 VAR CustomersAtRisk = 
     CALCULATETABLE(
-        VALUES(calls[customer_id]),
-        calls[satisfaction_score] <= 2
+        VALUES(fact_calls[customer_id]),
+        fact_calls[satisfaction_score] <= 2
     )
-VAR AvgOrderValue = AVERAGE(orders[total_amount_eur])
+VAR AvgOrderValue = AVERAGE(fact_orders[total_amount_eur])
 RETURN
     COUNTROWS(CustomersAtRisk) * AvgOrderValue
 ```
@@ -249,7 +249,7 @@ Nombre d'appels par agent.
 Calls Per Agent = 
 DIVIDE(
     COUNTROWS(calls),
-    DISTINCTCOUNT(calls[agent_id]),
+    DISTINCTCOUNT(fact_calls[agent_id]),
     BLANK()
 )
 ```
@@ -266,7 +266,7 @@ CSAT moyen de l'agent sélectionné.
 ```dax
 Agent CSAT = 
 DIVIDE(
-    AVERAGE(calls[satisfaction_score]),
+    AVERAGE(fact_calls[satisfaction_score]),
     5,
     BLANK()
 ) * 100
@@ -286,7 +286,7 @@ CSAT moyen de l'équipe (pour comparaison).
 Team Average CSAT = 
 CALCULATE(
     DIVIDE(
-        AVERAGE(calls[satisfaction_score]),
+        AVERAGE(fact_calls[satisfaction_score]),
         5,
         BLANK()
     ) * 100,
@@ -320,9 +320,9 @@ Nombre d'agents au-dessus de la moyenne.
 ```dax
 Top Performing Agents Count = 
 CALCULATE(
-    DISTINCTCOUNT(calls[agent_id]),
+    DISTINCTCOUNT(fact_calls[agent_id]),
     FILTER(
-        VALUES(calls[agent_id]),
+        VALUES(fact_calls[agent_id]),
         [Agent CSAT] > [Team Average CSAT]
     )
 )
@@ -343,7 +343,7 @@ Nombre d'appels par raison.
 Calls by Reason = 
 CALCULATE(
     COUNTROWS(calls),
-    ALLEXCEPT(calls, calls[reason])
+    ALLEXCEPT(calls, fact_calls[reason])
 )
 ```
 
@@ -360,7 +360,7 @@ CSAT moyen par raison d'appel.
 CSAT by Reason = 
 CALCULATE(
     [CSAT],
-    ALLEXCEPT(calls, calls[reason])
+    ALLEXCEPT(calls, fact_calls[reason])
 )
 ```
 
@@ -377,7 +377,7 @@ AHT moyen par raison.
 AHT by Reason = 
 CALCULATE(
     [AHT],
-    ALLEXCEPT(calls, calls[reason])
+    ALLEXCEPT(calls, fact_calls[reason])
 )
 ```
 
@@ -394,7 +394,7 @@ Revenue total des commandes.
 
 ```dax
 Total Revenue = 
-SUM(orders[total_amount_eur])
+SUM(fact_orders[total_amount_eur])
 ```
 
 **Format:** Currency (EUR)
@@ -412,7 +412,7 @@ CALCULATE(
     COUNTROWS(orders),
     FILTER(
         orders,
-        orders[customer_id] IN VALUES(calls[customer_id])
+        fact_orders[customer_id] IN VALUES(fact_calls[customer_id])
     )
 )
 ```
@@ -429,7 +429,7 @@ Panier moyen.
 ```dax
 Avg Order Value = 
 DIVIDE(
-    SUM(orders[total_amount_eur]),
+    SUM(fact_orders[total_amount_eur]),
     COUNTROWS(orders),
     BLANK()
 )
@@ -472,12 +472,12 @@ Resolution Time Impact =
 VAR ShortCalls = 
     CALCULATE(
         [CSAT],
-        calls[call_duration] < [AHT]
+        fact_calls[call_duration] < [AHT]
     )
 VAR LongCalls = 
     CALCULATE(
         [CSAT],
-        calls[call_duration] >= [AHT]
+        fact_calls[call_duration] >= [AHT]
     )
 RETURN
     ShortCalls - LongCalls
@@ -496,13 +496,13 @@ Impact appels sur valeur client.
 Customer Lifetime Impact = 
 VAR SatisfiedCustomers = 
     CALCULATE(
-        AVERAGE(orders[total_amount_eur]),
-        calls[satisfaction_score] >= 4
+        AVERAGE(fact_orders[total_amount_eur]),
+        fact_calls[satisfaction_score] >= 4
     )
 VAR UnsatisfiedCustomers = 
     CALCULATE(
-        AVERAGE(orders[total_amount_eur]),
-        calls[satisfaction_score] <= 2
+        AVERAGE(fact_orders[total_amount_eur]),
+        fact_calls[satisfaction_score] <= 2
     )
 RETURN
     SatisfiedCustomers - UnsatisfiedCustomers

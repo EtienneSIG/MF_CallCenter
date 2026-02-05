@@ -10,7 +10,7 @@ volumes:
   products: 80
   orders: 20000
   order_lines: 60000  # Sera calculé automatiquement (3 lignes/commande en moyenne)
-  calls: 3000
+  calls: 200
   agents: 25
 
 # Période de génération (ISO 8601)
@@ -65,7 +65,7 @@ business_params:
   # Transcripts
   transcripts:
     language: "fr"
-    avg_exchanges: 6  # Nombre moyen d'échanges client/agent
+    avg_exchanges: 20  # Nombre moyen d'échanges client/agent
     std_dev_exchanges: 2
     include_fake_pii: true  # Inclure de fausses PII pour démo
     pii_probability: 0.3  # Probabilité qu'un transcript contienne PII
